@@ -10,6 +10,21 @@ import { createApp } from './app.js';
 const settings = { tailscaleHostname: 'tower.tailnet.ts.net', defaultScheme: 'http', refreshSeconds: 30 };
 const raw = { id: 'changing-docker-id', names: ['/Plex'], image: 'plex', state: 'RUNNING', status: 'Up 3 hours', ports: [{ privatePort: 32400, publicPort: 32401, type: 'TCP' }] };
 async function directory(t) { const dir = await mkdtemp(path.join(tmpdir(), 'unraid-test-')); t.after(() => rm(dir, { recursive: true, force: true })); return dir; }
+test('requests are rate limited without making health checks unavailable', async t => {
+  const base = await running(t, { env: { DATA_DIR: await directory(t) } });
+  for (let index = 0; index < 600; index++) {
+    const response = await fetch(`${base}/api/not-found`);
+    assert.equal(response.status, 404);
+    await response.json();
+  }
+  const blocked = await fetch(`${base}/api/dashboard`);
+  assert.equal(blocked.status, 429);
+  assert.ok(Number(blocked.headers.get('retry-after')) > 0);
+  assert.match((await blocked.json()).error, /Too many requests/);
+  const health = await fetch(`${base}/api/health`);
+  assert.equal(health.status, 200);
+  await health.json();
+});
 test('template URLs rewrite hostname and map internal ports while preserving paths', () => {
   const app = normalizeContainer({ ...raw, webUiUrl: 'http://[IP]:[PORT:32400]/web?hello=1' }, settings);
   assert.equal(app.url, 'http://tower.tailnet.ts.net:32401/web?hello=1');

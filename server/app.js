@@ -1,4 +1,5 @@
 import express from 'express';
+import { rateLimit } from 'express-rate-limit';
 import path from 'node:path';
 import { existsSync } from 'node:fs';
 import { createStore } from './store.js';
@@ -20,6 +21,14 @@ export async function createApp({ env = process.env, fetchImpl = fetch, client: 
   }
   const app = express();
   app.disable('x-powered-by');
+  app.use(rateLimit({
+    windowMs: 60_000,
+    limit: 600,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    skip: req => req.path === '/api/health',
+    message: { error: 'Too many requests. Please wait a minute before trying again.' },
+  }));
   app.use('/api', (_req, res, next) => { res.set('Cache-Control', 'no-store'); res.set('X-Content-Type-Options', 'nosniff'); next(); });
   app.use('/api', (req, _res, next) => {
     if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {

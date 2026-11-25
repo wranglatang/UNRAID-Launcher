@@ -179,6 +179,8 @@ A single published TCP port can be used as a fallback. Multiple ports, host netw
 
 Container status reflects Docker’s reported state, not an HTTP check of the destination. If discovery temporarily fails, the launcher can show its last results as stale. Missing icons fall back to a local symbol. Older API schemas may not expose template icons or all discovery metadata.
 
+Requests are limited to 600 per minute per client IP; health checks are excluded. Behind a reverse proxy, clients share the proxy’s allowance because forwarded IP headers are not trusted by default. If you receive HTTP 429, wait for the retry interval before refreshing.
+
 ## Updates and backups
 
 For a Git checkout using Compose:
