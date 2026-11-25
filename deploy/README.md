@@ -46,7 +46,7 @@ To migrate an existing Docker-screen installation, edit that existing container,
 
 ## Updating
 
-Use **Check for Updates** and the available update action on Unraid’s Docker page. `latest` follows the stable release. To pin a release, set the Repository field to a version such as `ghcr.io/wranglatang/unraid-launcher:1.0.0`; `LAUNCHER_IMAGE` controls Compose only.
+Use **Check for Updates** and the available update action on Unraid’s Docker page. `latest` follows the stable release. To pin a release, set the Repository field to a version such as `ghcr.io/wranglatang/unraid-launcher:1.0.1`; `LAUNCHER_IMAGE` controls Compose only.
 
 After editing `.env`, apply the container settings to recreate it. A plain restart does not reload environment values. Source builds remain available in [the optional build guide](../docs/BUILDING.md).
 
