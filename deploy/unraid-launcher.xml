@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <Container version="2">
   <Name>unraid-launcher</Name>
-  <Repository>unraid-launcher:local</Repository>
-  <Registry></Registry>
+  <Repository>ghcr.io/wranglatang/unraid-launcher:latest</Repository>
+  <Registry>https://ghcr.io/wranglatang/unraid-launcher</Registry>
   <Network>bridge</Network>
   <MyIP></MyIP>
   <Shell>sh</Shell>
@@ -12,7 +12,7 @@
   <Overview>A private home screen for your Unraid services. Configure the Unraid API key and Tailscale hostname in /mnt/user/appdata/unraid-launcher/.env. Dashboard data is stored in the mapped appdata folder.</Overview>
   <Category>Tools:</Category>
   <WebUI>http://[IP]:[PORT:3000]/</WebUI>
-  <TemplateURL></TemplateURL>
+  <TemplateURL>https://raw.githubusercontent.com/wranglatang/UNRAID-Launcher/main/deploy/unraid-launcher.xml</TemplateURL>
   <Icon>https://raw.githubusercontent.com/wranglatang/UNRAID-Launcher/main/public/icons/launcher-512-v1.png</Icon>
   <ExtraParams>--env-file=/mnt/user/appdata/unraid-launcher/.env --security-opt=no-new-privileges:true --cap-drop=ALL</ExtraParams>
   <PostArgs></PostArgs>

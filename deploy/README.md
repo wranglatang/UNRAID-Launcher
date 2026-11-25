@@ -1,83 +1,67 @@
 # Install through Unraid’s Docker screen
 
-This guide uses a locally built image and Unraid’s Docker screen, without Docker Compose. The template in this folder is for local installation, not the future Community Applications submission.
+This installs the published x86-64 image without Docker Compose or a local build. The template currently reads a private environment file. A self-contained Community Applications installer is a separate next step.
 
-## 1. Prepare the files
+## 1. Prepare configuration and storage
 
-Follow the main README to download or clone the source into:
-
-```text
-/mnt/user/appdata/unraid-launcher/source
-```
-
-In the Unraid terminal:
+For a new installation, run in the Unraid terminal:
 
 ```sh
 mkdir -p /mnt/user/appdata/unraid-launcher/data
-cp /mnt/user/appdata/unraid-launcher/source/.env.example /mnt/user/appdata/unraid-launcher/.env
+curl -fL https://raw.githubusercontent.com/wranglatang/UNRAID-Launcher/main/.env.example -o /mnt/user/appdata/unraid-launcher/.env
 chmod 600 /mnt/user/appdata/unraid-launcher/.env
 chown 1000:1000 /mnt/user/appdata/unraid-launcher/data
 chmod 700 /mnt/user/appdata/unraid-launcher/data
 ```
 
-Run the copy step only for a new installation; do not overwrite an existing `.env`. The ownership command applies to this app’s data directory only. The container runs as UID/GID `1000:1000`.
+**Existing installation:** preserve your existing `.env` and data directory; do not run the download command over your real configuration. Keep the same data mapping when changing from a local image or another installation method.
 
 Edit `/mnt/user/appdata/unraid-launcher/.env` with your Unraid URL, Docker-read API key, and destination hostname. Keep `DEMO_MODE=false`. See the [configuration instructions](../README.md#3-configure-your-server).
 
-The template reads these values using `--env-file`; it does not duplicate the key in the XML. Protect the environment file and server backups. Docker administrators can still inspect the container environment.
+The container runs as UID/GID `1000:1000`. The ownership command applies only to this app’s data directory. The template uses `--env-file` so the key is not duplicated in XML; protect the file and backups. Docker administrators can still inspect the container environment.
 
-## 2. Build the local image
-
-```sh
-docker build --pull -t unraid-launcher:local /mnt/user/appdata/unraid-launcher/source
-```
-
-## 3. Install the Docker-screen template
+## 2. Install the Docker-screen template
 
 ```sh
 mkdir -p /boot/config/plugins/dockerMan/templates-user
-cp /mnt/user/appdata/unraid-launcher/source/deploy/unraid-launcher.xml /boot/config/plugins/dockerMan/templates-user/my-unraid-launcher.xml
+curl -fL https://raw.githubusercontent.com/wranglatang/UNRAID-Launcher/main/deploy/unraid-launcher.xml -o /boot/config/plugins/dockerMan/templates-user/my-unraid-launcher.xml
 ```
 
 In Unraid, open **Docker → Add Container**, select the `unraid-launcher` user template, and check:
 
 | Setting | Value |
 | --- | --- |
-| Repository | `unraid-launcher:local` |
+| Repository | `ghcr.io/wranglatang/unraid-launcher:latest` |
 | Network | `bridge` |
 | Privileged | Off |
 | Web interface | Host `9999` → container `3000` |
 | Dashboard data | `/mnt/user/appdata/unraid-launcher/data` → `/data` |
 | Extra parameters | Environment-file path, no-new-privileges, and dropped capabilities from the template |
 
-Choose **Apply**, then enable **Autostart** for the container on the Docker page if desired. If port `9999` is occupied, edit the host-side port here; `LAUNCHER_PORT` controls Compose only.
+Choose **Apply** to download and start the image. No registry login is required. Enable **Autostart** on the Docker page if desired. If `9999` is occupied, change the host-side port here; `LAUNCHER_PORT` controls Compose only.
 
-Open the container’s **WebUI** or browse to your server on port `9999`. Follow [Make it yours](../README.md#make-it-yours) to add favourite apps and folders.
+Open the container’s **WebUI** or browse to your server on port `9999`. Follow [Make it yours](../README.md#make-it-yours) to add favourites and folders.
+
+To migrate an existing Docker-screen installation, edit that existing container, replace `unraid-launcher:local` with the published image reference, preserve all environment-file, port, and data mappings, and choose **Apply**. Do not add a second container with the same name.
 
 ## Updating
 
-For a Git checkout:
+Use **Check for Updates** and the available update action on Unraid’s Docker page. `latest` follows the stable release. To pin a release, set the Repository field to a version such as `ghcr.io/wranglatang/unraid-launcher:1.0.0`; `LAUNCHER_IMAGE` controls Compose only.
+
+After editing `.env`, apply the container settings to recreate it. A plain restart does not reload environment values. Source builds remain available in [the optional build guide](../docs/BUILDING.md).
+
+For the direct Docker command in the main README:
 
 ```sh
-cd /mnt/user/appdata/unraid-launcher/source
-git pull --ff-only
-docker build --pull -t unraid-launcher:local .
-```
-
-For a ZIP installation, replace the source with the new download and run the same build command. Preserve `.env` and `data` in the parent directory.
-
-Edit the container on Unraid’s Docker page and choose **Apply** to recreate it using the rebuilt image. Apply container changes after editing `.env` too: a restart alone does not reload its values. A local image is not updated by pulling from a public registry.
-
-For the direct Docker command from the main README, preserve its named volume when recreating:
-
-```sh
-docker build --pull -t unraid-launcher:local .
+docker pull ghcr.io/wranglatang/unraid-launcher:latest
 docker stop unraid-launcher
 docker rm unraid-launcher
 ```
 
-Then repeat the original `docker run` command from the same directory with the same `.env`, port, and `unraid-launcher-data` volume. Do not remove the volume.
+Repeat the original `docker run` command from the same directory, using the same `.env`, port, and `unraid-launcher-data` volume. Do not remove the volume.
 
-## Backups
+## Backups and rollback
 
-Back up the `data` directory and protect `.env` with your server configuration backups. Stop the container while restoring data. Removing or recreating the container does not delete the bind-mounted data folder. Keep the same mapping when changing installation methods so your dashboard is retained.
+Back up `dashboard.json` from the mapped data directory/volume and protect `.env`. Stop the container while restoring data. Removing or recreating the container does not delete a bind-mounted data folder.
+
+Previous image versions remain available for rollback. Keep a backup from before upgrading; future saved-data formats may not support downgrading without restoring that backup. Always preserve the original data mapping when switching installation methods.
