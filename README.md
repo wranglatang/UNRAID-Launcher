@@ -44,7 +44,7 @@ The launcher reads container information. It does not start, stop, or change you
 
 The launcher does not install Tailscale or proxy your applications. Your browser must be able to reach each service directly. No minimum Unraid version has been verified yet; compatibility depends on the available API schema.
 
-**Ready-to-install image:** `ghcr.io/wranglatang/unraid-launcher:latest` ([published versions](https://github.com/wranglatang/UNRAID-Launcher/pkgs/container/unraid-launcher)). The image supports x86-64 (`linux/amd64`), matching Unraid servers. No compiler, Node.js installation, or GitHub sign-in is needed on your server. Community Applications submission is still pending; an Apps-tab installation is not available yet.
+**Ready-to-install image:** `ghcr.io/wranglatang/unraid-launcher:latest` ([published versions](https://github.com/wranglatang/UNRAID-Launcher/pkgs/container/unraid-launcher)). The image supports x86-64 (`linux/amd64`), matching Unraid servers. No compiler, Node.js installation, or GitHub sign-in is needed on your server. Community Applications approved the repository on 25 November 2026; the app is awaiting the next catalogue build before appearing in Unraid’s Apps tab. Until then, use the [manual Unraid template installation](deploy/README.md) or Docker Compose below.
 
 ### 1. Download the configuration
 

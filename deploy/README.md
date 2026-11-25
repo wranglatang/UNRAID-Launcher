@@ -1,6 +1,6 @@
 # Install through Unraid’s Docker screen
 
-This installs the published x86-64 image without Docker Compose, a local build, or a separate environment file. Community Applications submission is being prepared; until approval, you can import the same template manually.
+This installs the published x86-64 image without Docker Compose, a local build, or a separate environment file. Community Applications approved the repository on 25 November 2026. The app is awaiting the next catalogue build; until it appears in the Apps tab, you can import the same template manually.
 
 ## Install the template
 
