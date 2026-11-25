@@ -11,6 +11,14 @@ A lightweight, self-hosted home screen for your Unraid services. Discover Docker
 [![Security](https://github.com/wranglatang/UNRAID-Launcher/actions/workflows/security.yml/badge.svg)](https://github.com/wranglatang/UNRAID-Launcher/actions/workflows/security.yml)
 [![Licence: MIT](https://img.shields.io/badge/Licence-MIT-blue.svg)](LICENSE)
 
+## Why I built this
+
+I wanted a quick way to open my Unraid apps from my desktop or phone. The bookmarking and dashboard apps I tried involved more setup than I wanted: entering individual IP addresses and port numbers, choosing a theme, and arranging a browser landing page. My everyday need was simple: open a shortcut, tap an app, and get on with using it.
+
+Unraid Launcher keeps that setup small. Connect it to Unraid, set your destination hostname, and choose your favourite apps. It discovers service links where Unraid provides enough information, follows your device’s light or dark appearance, and offers folders when you need them. You can still override a link when automatic discovery needs a hand.
+
+The design puts quick access from a phone first, with particular attention to the iPhone Duo’s layouts. **Tested by the author on an iPhone 15 and an iPhone Duo.** Add it to your Home Screen for an app-like starting point for your services.
+
 ## What you can do
 
 - **Pin favourites** for quick access from the home screen.
