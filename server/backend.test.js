@@ -32,7 +32,7 @@ test('template URLs rewrite hostname and map internal ports while preserving pat
   assert.equal(normalizeContainer({ ...raw, webUiUrl: 'http://[IP]:[PORT]/web' }, settings).url, 'http://tower.tailnet.ts.net:32401/web');
 });
 test('explicit port keeps resolved template path and scheme', () => {
-  const app = normalizeContainer({ ...raw, webUiUrl: 'https://10.168.40.1:32400/web' }, settings, { 'container:Plex': { port: 5555 } });
+  const app = normalizeContainer({ ...raw, webUiUrl: 'https://192.0.2.10:32400/web' }, settings, { 'container:Plex': { port: 5555 } });
   assert.equal(app.url, 'https://tower.tailnet.ts.net:5555/web');
 });
 test('ambiguous and UDP-only ports never invent a link', () => {
@@ -201,7 +201,7 @@ test('partial data with unrelated errors or mismatched nullable port paths remai
   }
 });
 test('Unraid shortcut uses Magic DNS while preserving the server scheme, port and base path', () => {
-  const shortcut = buildUnraidShortcut('https://10.168.40.1:8443/base/graphql', settings);
+  const shortcut = buildUnraidShortcut('https://192.0.2.10:8443/base/graphql', settings);
   assert.equal(shortcut.url, 'https://tower.tailnet.ts.net:8443/base/');
   assert.equal(shortcut.id, 'shortcut:unraid');
   assert.equal(shortcut.kind, 'shortcut');
@@ -209,16 +209,16 @@ test('Unraid shortcut uses Magic DNS while preserving the server scheme, port an
   assert.equal(shortcut.urlSource, 'server');
   assert.equal(shortcut.state, 'link');
   assert.deepEqual(shortcut.ports, []);
-  assert.equal(buildUnraidShortcut('http://10.168.40.1/graphql/', settings).url, 'http://tower.tailnet.ts.net/');
-  assert.equal(buildUnraidShortcut('http://10.168.40.1/base', { ...settings, tailscaleHostname: '' }).url, 'http://10.168.40.1/base');
+  assert.equal(buildUnraidShortcut('http://192.0.2.10/graphql/', settings).url, 'http://tower.tailnet.ts.net/');
+  assert.equal(buildUnraidShortcut('http://192.0.2.10/base', { ...settings, tailscaleHostname: '' }).url, 'http://192.0.2.10/base');
 });
 test('Unraid shortcut supports persisted name, port, scheme and full URL overrides', () => {
   const override = validateLayout({ ...emptyLayout(), overrides: { 'shortcut:unraid': { name: 'My server', port: 9443, scheme: 'https' } } }).overrides;
-  const shortcut = buildUnraidShortcut('http://10.168.40.1/graphql', settings, override);
+  const shortcut = buildUnraidShortcut('http://192.0.2.10/graphql', settings, override);
   assert.equal(shortcut.name, 'My server');
   assert.equal(shortcut.url, 'https://tower.tailnet.ts.net:9443/');
   assert.equal(shortcut.urlSource, 'override');
-  assert.equal(buildUnraidShortcut('http://10.168.40.1', settings, { 'shortcut:unraid': { url: 'https://custom.example/dashboard', port: 4444 } }).url, 'https://custom.example/dashboard');
+  assert.equal(buildUnraidShortcut('http://192.0.2.10', settings, { 'shortcut:unraid': { url: 'https://custom.example/dashboard', port: 4444 } }).url, 'https://custom.example/dashboard');
   assert.throws(() => validateLayout({ ...emptyLayout(), overrides: { 'shortcut:unraid': { url: 'https://user:secret@example.com/' } } }), /without credentials/);
 });
 test('server shortcut remains usable with API disconnected and never changes Docker counts', async t => {
