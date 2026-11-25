@@ -30,7 +30,7 @@ jobs:
       - run: npm test
       - run: npm run build
       - name: Validate deployment XML
-        run: python3 -c "import pathlib, xml.etree.ElementTree as ET; [ET.parse(p) for p in pathlib.Path('deploy').glob('*.xml')]"
+        run: python3 -c "import pathlib, xml.etree.ElementTree as ET; [ET.parse(p) for p in [pathlib.Path('ca_profile.xml'), *pathlib.Path('deploy').glob('*.xml')]]"
   docker:
     name: Docker startup and persistence
     runs-on: ubuntu-latest
@@ -47,3 +47,9 @@ jobs:
         run: docker build --pull -t unraid-launcher:check .
       - name: Check startup and persistence
         run: bash scripts/check-container.sh unraid-launcher:check
+      - name: Check Unraid appdata ownership
+        run: |
+          data_dir=$(mktemp -d)
+          sudo chown 99:100 "$data_dir"
+          sudo chmod 700 "$data_dir"
+          CHECK_BIND_DIR="$data_dir" CHECK_USER=99:100 bash scripts/check-container.sh unraid-launcher:check

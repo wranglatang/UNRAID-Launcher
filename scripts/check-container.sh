@@ -4,17 +4,20 @@ set -euo pipefail
 image=${1:-unraid-launcher:check}
 container="launcher-check-${RANDOM}"
 volume="launcher-check-${RANDOM}"
+data_mount=${CHECK_BIND_DIR:-$volume}
+user_args=()
+if [[ -n "${CHECK_USER:-}" ]]; then user_args=(--user "$CHECK_USER"); fi
 cleanup() {
   docker logs "$container" 2>/dev/null || true
   docker rm -f "$container" >/dev/null 2>&1 || true
-  docker volume rm "$volume" >/dev/null 2>&1 || true
+  if [[ -z "${CHECK_BIND_DIR:-}" ]]; then docker volume rm "$volume" >/dev/null 2>&1 || true; fi
 }
 trap cleanup EXIT
-docker volume create "$volume" >/dev/null
+if [[ -z "${CHECK_BIND_DIR:-}" ]]; then docker volume create "$volume" >/dev/null; fi
 start() {
   docker run -d --name "$container" \
     --env DEMO_MODE=true --env UNRAID_URL=http://unraid.example.test \
-    --publish 127.0.0.1::3000 --volume "$volume:/data" \
+    --publish 127.0.0.1::3000 --volume "$data_mount:/data" "${user_args[@]}" \
     --security-opt=no-new-privileges:true --cap-drop=ALL \
     "$image" >/dev/null
   address="http://$(docker port "$container" 3000/tcp)"
