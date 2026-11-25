@@ -1,22 +1,28 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <Container version="2">
   <Name>unraid-launcher</Name>
   <Repository>ghcr.io/wranglatang/unraid-launcher:latest</Repository>
   <Registry>https://ghcr.io/wranglatang/unraid-launcher</Registry>
   <Network>bridge</Network>
-  <MyIP></MyIP>
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
   <Support>https://github.com/wranglatang/UNRAID-Launcher/issues</Support>
   <Project>https://github.com/wranglatang/UNRAID-Launcher</Project>
-  <Overview>A private home screen for your Unraid services. Configure the Unraid API key and Tailscale hostname in /mnt/user/appdata/unraid-launcher/.env. Dashboard data is stored in the mapped appdata folder.</Overview>
-  <Category>Tools:</Category>
+  <ReadMe>https://raw.githubusercontent.com/wranglatang/UNRAID-Launcher/main/README.md</ReadMe>
+  <Overview>A quick, phone-first launcher for your Unraid services. Discover Docker containers through the Unraid API, pin favourite apps, arrange folders and open services using your destination hostname. Layouts are saved on the server and shared across devices. Enter your Unraid WebGUI address and an API key with Docker read permission below. Set your Tailscale MagicDNS hostname, or leave it empty to manage the hostname in Settings. Tailscale is not installed in this container. Intended for a trusted private network: there is no login, and anyone who can reach the launcher can view and edit the shared dashboard.</Overview>
+  <Category>Tools:Utilities</Category>
+  <ExtraSearchTerms>dashboard homepage bookmarks favourites favorites tailscale launcher</ExtraSearchTerms>
   <WebUI>http://[IP]:[PORT:3000]/</WebUI>
   <TemplateURL>https://raw.githubusercontent.com/wranglatang/UNRAID-Launcher/main/deploy/unraid-launcher.xml</TemplateURL>
   <Icon>https://raw.githubusercontent.com/wranglatang/UNRAID-Launcher/main/public/icons/launcher-512-v1.png</Icon>
-  <ExtraParams>--env-file=/mnt/user/appdata/unraid-launcher/.env --security-opt=no-new-privileges:true --cap-drop=ALL</ExtraParams>
-  <PostArgs></PostArgs>
-  <CPUset></CPUset>
-  <Config Name="Web interface" Target="3000" Default="9999" Mode="tcp" Description="Launcher web interface" Type="Port" Display="always" Required="true" Mask="false">9999</Config>
-  <Config Name="Dashboard data" Target="/data" Default="/mnt/user/appdata/unraid-launcher/data" Mode="rw" Description="Persistent favourites, folders and preferences" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/unraid-launcher/data</Config>
+  <ExtraParams>--user=99:100 --security-opt=no-new-privileges:true --cap-drop=ALL</ExtraParams>
+  <Requires>Unraid GraphQL API with Docker read access. Tailscale and MagicDNS are needed for Tailscale links. Use a trusted private network or an authenticated access layer.</Requires>
+  <License>MIT</License>
+  <Changes>1.0.2: Self-contained Unraid installation fields, appdata ownership matching Unraid, and reviewed dependency/runtime updates.</Changes>
+  <Config Name="Web interface" Target="3000" Default="9999" Mode="tcp" Description="Host port for the launcher web interface." Type="Port" Display="always" Required="true" Mask="false">9999</Config>
+  <Config Name="Dashboard data" Target="/data" Default="/mnt/user/appdata/unraid-launcher/data" Mode="rw" Description="Persistent favourites, folders and preferences. The Unraid template runs as UID 99 and GID 100. Preserve this mapping when updating." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/unraid-launcher/data</Config>
+  <Config Name="Unraid WebGUI address" Target="UNRAID_URL" Default="" Description="Your server HTTP or HTTPS WebGUI origin, reachable from this container. Include a port if needed. Do not use localhost; the launcher appends the GraphQL path." Type="Variable" Display="always" Required="true" Mask="false"></Config>
+  <Config Name="Unraid API key" Target="UNRAID_API_KEY" Default="" Description="An Unraid API key with permission to read Docker container information. The key stays in the backend environment. Protect container templates and backups." Type="Variable" Display="always" Required="true" Mask="true"></Config>
+  <Config Name="Destination hostname" Target="TAILSCALE_HOSTNAME" Default="" Description="Your Tailscale MagicDNS hostname, without a protocol, port or path. Leave empty to choose the hostname in the launcher Settings." Type="Variable" Display="always" Required="false" Mask="false"></Config>
+  <Config Name="Demo mode" Target="DEMO_MODE" Default="false" Description="Keep false for a real server. True uses illustrative sample services instead of connecting to Unraid." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
 </Container>

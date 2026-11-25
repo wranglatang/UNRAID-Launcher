@@ -34,12 +34,15 @@ Vite and its React plugin are grouped together because major updates can require
 
 For long inactive periods, configure an external trigger and monitor its success. Do not claim unattended maintenance based only on GitHub schedules.
 
-## Before Community Applications distribution
+## Community Applications submission and upkeep
 
-- Keep the published x86-64 image available for anonymous pulls and retain versioned images for rollback.
-- Add root `ca_profile.xml` and a separate distribution template with a public image/icon, real links, and configuration fields. The existing `deploy/unraid-launcher.xml` uses the public image but requires a local environment file; it must be adapted for a self-contained Apps-tab installation before submission.
-- Verify fresh installation, data-folder permissions, persistence, upgrade, and rollback on Unraid.
-- Document supported Unraid/API versions based on actual tests and add screenshots using demo data.
-- Run Validate and Scan in the [Community Applications submission flow](https://ca.unraid.net/submit/help), then submit for review.
+The root `ca_profile.xml` and `deploy/unraid-launcher.xml` provide repository metadata and a self-contained installation form. The template uses the public stable image, a masked API-key field, bridge networking, dropped capabilities, and non-root UID/GID `99:100`. CI verifies persistent bind-mounted data owned by that identity as well as the image-default named volume.
+
+- Keep the public image available for anonymous pulls and retain fixed versions for rollback.
+- Run Validate and Scan in the [Community Applications submission flow](https://ca.unraid.net/submit/help) after meaningful XML changes, then submit for review.
+- The submission flow requires the Unraid Community Apps GitHub App with Contents read and Issues write access for this repository. Review its repository-health issues and respond to moderator requests.
+- Do not mark an Apps-tab installation available in the README until the listing is approved and visible.
+- Test real Unraid installation, persistence and update detection. Record tested versions from actual checks rather than guessing compatibility.
+- Keep account two-factor authentication enabled, and maintain the support URL and repository health.
 
 Keep read-only Unraid API access, non-root execution, and backend credential handling. Avoid the Docker socket and preserve user data.

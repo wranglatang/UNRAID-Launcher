@@ -203,7 +203,7 @@ docker compose pull
 docker compose up -d
 ```
 
-`latest` follows the current stable release. To pin a version, set `LAUNCHER_IMAGE=ghcr.io/wranglatang/unraid-launcher:1.0.1` in `.env`. A registry digest pins the exact image bytes. Previous version tags are retained for rollback; back up your data before upgrading or downgrading, since future data formats may not be backward compatible.
+`latest` follows the current stable release. To pin a version, set `LAUNCHER_IMAGE=ghcr.io/wranglatang/unraid-launcher:1.0.2` in `.env`. A registry digest pins the exact image bytes. Previous version tags are retained for rollback; back up your data before upgrading or downgrading, since future data formats may not be backward compatible.
 
 Unraid Docker-screen users can check for updates on the Docker page. Publishing an image does not force an update on your server. For direct Docker and Docker-screen instructions, see [native updates](deploy/README.md#updating).
 
@@ -211,7 +211,7 @@ Building from source remains optional; see [the source-build guide](docs/BUILDIN
 
 Compose uses its `launcher-data` named volume. The direct Docker command uses `unraid-launcher-data`. The Docker-screen guide uses a bind-mounted appdata folder. Keep the same data mapping when updating or switching install methods.
 
-Back up `dashboard.json` from your data volume/folder and back up `.env` securely. Stop the container while restoring data. Recreating a container preserves mounted data; **`docker compose down -v` deletes Compose volumes**. A bind-mounted folder must be writable by the container’s `node` user, UID/GID `1000:1000`.
+Back up `dashboard.json` from your data volume/folder and back up `.env` securely. Stop the container while restoring data. Recreating a container preserves mounted data; **`docker compose down -v` deletes Compose volumes**. The Unraid template runs as UID/GID `99:100`, matching folders created by Unraid. Compose and direct Docker use the image’s `node` user (`1000:1000`). A bind-mounted folder must be writable by the user used for that installation; preserve the original mapping and ownership when migrating.
 
 ## Troubleshooting
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CommunityApplications>
+  <Profile>Unraid applications maintained by wranglatang. Unraid Launcher provides a lightweight, phone-first home screen for Docker services, with favourites, folders and automatic service discovery. Documentation and support are available through the project repository and GitHub Issues.</Profile>
+  <Icon>https://raw.githubusercontent.com/wranglatang/UNRAID-Launcher/main/public/icons/launcher-512-v1.png</Icon>
+  <WebPage>https://github.com/wranglatang/UNRAID-Launcher</WebPage>
+  <Forum>https://github.com/wranglatang/UNRAID-Launcher/issues</Forum>
+</CommunityApplications>
