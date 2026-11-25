@@ -44,19 +44,22 @@ The launcher reads container information. It does not start, stop, or change you
 
 The launcher does not install Tailscale or proxy your applications. Your browser must be able to reach each service directly. No minimum Unraid version has been verified yet; compatibility depends on the available API schema.
 
-**Distribution status:** installation currently builds the image from source. A published container image and Community Applications listing are planned; an Apps-tab installation is not available yet.
+**Ready-to-install image:** `ghcr.io/wranglatang/unraid-launcher:latest` ([published versions](https://github.com/wranglatang/UNRAID-Launcher/pkgs/container/unraid-launcher)). The image supports x86-64 (`linux/amd64`), matching Unraid servers. No compiler, Node.js installation, or GitHub sign-in is needed on your server. Community Applications submission is still pending; an Apps-tab installation is not available yet.
 
-### 1. Get the source
+### 1. Download the configuration
 
-On your Unraid server:
+For a new installation using Docker Compose, open your Unraid terminal:
 
 ```sh
 mkdir -p /mnt/user/appdata/unraid-launcher
-git clone https://github.com/wranglatang/UNRAID-Launcher.git /mnt/user/appdata/unraid-launcher/source
-cd /mnt/user/appdata/unraid-launcher/source
+cd /mnt/user/appdata/unraid-launcher
+curl -fLO https://raw.githubusercontent.com/wranglatang/UNRAID-Launcher/main/compose.yaml
+curl -fLO https://raw.githubusercontent.com/wranglatang/UNRAID-Launcher/main/.env.example
 ```
 
-If Git is unavailable, download **Code → Download ZIP** from [the repository](https://github.com/wranglatang/UNRAID-Launcher), extract it, and copy the files into that source directory.
+You can also download those two files from [the repository](https://github.com/wranglatang/UNRAID-Launcher) and copy them into the folder yourself. To install through Unraid’s Docker screen without Compose, use the [native Unraid guide](deploy/README.md).
+
+**Already installed from source?** Keep your existing Compose project directory, `.env`, and data mapping. Update the Compose file in place and use the commands below. Moving to a different project directory can select a different named volume and make your saved dashboard appear missing.
 
 ### 2. Create an API key
 
@@ -66,7 +69,7 @@ Keep the key private. The backend passes it to Unraid; it is not sent to your br
 
 ### 3. Configure your server
 
-From the source directory:
+From your installation directory (for a new installation only):
 
 ```sh
 cp .env.example .env
@@ -95,18 +98,19 @@ Your `.env` and saved dashboard data are excluded from Git. Never attach them to
 **With Docker Compose:**
 
 ```sh
-docker compose up -d --build
+docker compose pull
+docker compose up -d
 ```
 
 **Without Docker Compose:**
 
 ```sh
-docker build -t unraid-launcher:local .
+docker pull ghcr.io/wranglatang/unraid-launcher:latest
 docker run -d --name unraid-launcher --restart unless-stopped \
   --env-file .env -e DATA_DIR=/data -p 9999:3000 \
   -v unraid-launcher-data:/data \
   --security-opt=no-new-privileges:true --cap-drop=ALL \
-  unraid-launcher:local
+  ghcr.io/wranglatang/unraid-launcher:latest
 ```
 
 The direct Docker command uses `9999` literally; edit `-p` to choose another host port. `LAUNCHER_PORT` is used by Compose only. To install through Unraid’s Docker screen using an appdata folder, follow the [native Unraid guide](deploy/README.md).
@@ -173,6 +177,7 @@ Links open a new browser context. iOS may show services in a Safari-controlled v
 | `UNRAID_API_KEY` | Private key with Docker read permission | Empty |
 | `TAILSCALE_HOSTNAME` | Destination hostname; locks the hostname setting when supplied | Empty |
 | `LAUNCHER_PORT` | Compose host port | `9999` |
+| `LAUNCHER_IMAGE` | Compose image reference; use a version or digest to pin a release | `ghcr.io/wranglatang/unraid-launcher:latest` |
 | `DATA_DIR` | Directory containing `dashboard.json` | `/data` in Docker; `./data` locally |
 | `PORT` | Internal web server port | `3000` |
 | `DEMO_MODE` | Explicit sample-data preview | `false` |
@@ -191,15 +196,18 @@ Requests are limited to 600 per minute per client IP; health checks are excluded
 
 ## Updates and backups
 
-For a Git checkout using Compose:
+For a published-image installation using Compose, run from the same project directory used during installation:
 
 ```sh
-git pull --ff-only
-docker compose build --pull
+docker compose pull
 docker compose up -d
 ```
 
-For a downloaded ZIP, replace the source with the new download while preserving `.env`, then rebuild. For direct Docker and Docker-screen installs, see [native updates](deploy/README.md#updating).
+`latest` follows the current stable release. To pin a version, set `LAUNCHER_IMAGE=ghcr.io/wranglatang/unraid-launcher:1.0.0` in `.env`. A registry digest pins the exact image bytes. Previous version tags are retained for rollback; back up your data before upgrading or downgrading, since future data formats may not be backward compatible.
+
+Unraid Docker-screen users can check for updates on the Docker page. Publishing an image does not force an update on your server. For direct Docker and Docker-screen instructions, see [native updates](deploy/README.md#updating).
+
+Building from source remains optional; see [the source-build guide](docs/BUILDING.md).
 
 Compose uses its `launcher-data` named volume. The direct Docker command uses `unraid-launcher-data`. The Docker-screen guide uses a bind-mounted appdata folder. Keep the same data mapping when updating or switching install methods.
 
@@ -243,7 +251,7 @@ The production server serves the frontend and API together on port `3000`. See [
 
 ## Automated checks and maintenance
 
-GitHub Actions is configured for tests, production builds, XML validation, a Docker startup/persistence check, CodeQL analysis, and Trivy secret/container scans. Security checks also have a weekly schedule. Dependabot proposes weekly npm, Docker base-image, and workflow-action updates. These checks do not publish images or automatically merge changes.
+GitHub Actions is configured for tests, production builds, XML validation, a Docker startup/persistence check, CodeQL analysis, and Trivy secret/container scans. Security checks also have a weekly schedule. Dependabot proposes weekly npm, Docker base-image, and workflow-action updates. Stable version tags trigger a separate workflow that tests and scans the exact image before publishing it. Weekly security runs also pull the published image without registry credentials, check startup/persistence, and scan it. Dependency changes are proposed for review and are not automatically merged.
 
 Enable GitHub secret scanning, push protection, private vulnerability reporting, and branch protections in repository settings; see the [maintainer checklist](docs/MAINTAINING.md). Scans supplement review and cannot guarantee an absence of vulnerabilities.
 

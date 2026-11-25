@@ -1,0 +1,5 @@
+# Optional override for building the application from a local source checkout.
+services:
+  unraid-launcher:
+    image: unraid-launcher:local
+    build: .

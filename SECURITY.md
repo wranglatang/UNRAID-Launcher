@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Security fixes target the latest code on `main`. No published container release or older release line is maintained yet. After a fix, rebuild and recreate your container following the README.
+Security fixes target the latest published stable release. Older release lines are not separately maintained. After a fix, pull the updated image and recreate your container following the README. Source builds should use the corresponding release tag.
 
 ## Report privately
 

@@ -1,6 +1,6 @@
 services:
   unraid-launcher:
-    build: .
+    image: ${LAUNCHER_IMAGE:-ghcr.io/wranglatang/unraid-launcher:latest}
     container_name: unraid-launcher
     restart: unless-stopped
     ports:
