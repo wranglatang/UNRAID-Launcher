@@ -203,7 +203,7 @@ docker compose pull
 docker compose up -d
 ```
 
-`latest` follows the current stable release. To pin a version, set `LAUNCHER_IMAGE=ghcr.io/wranglatang/unraid-launcher:1.0.0` in `.env`. A registry digest pins the exact image bytes. Previous version tags are retained for rollback; back up your data before upgrading or downgrading, since future data formats may not be backward compatible.
+`latest` follows the current stable release. To pin a version, set `LAUNCHER_IMAGE=ghcr.io/wranglatang/unraid-launcher:1.0.1` in `.env`. A registry digest pins the exact image bytes. Previous version tags are retained for rollback; back up your data before upgrading or downgrading, since future data formats may not be backward compatible.
 
 Unraid Docker-screen users can check for updates on the Docker page. Publishing an image does not force an update on your server. For direct Docker and Docker-screen instructions, see [native updates](deploy/README.md#updating).
 

@@ -4,7 +4,7 @@ export function safeUrl(value) {
 export function containerId(raw) {
   return `container:${String(raw.names?.[0] || raw.name || raw.id).replace(/^\//, '')}`;
 }
-export function resolveIconUrl(raw, serverUrl = 'http://10.168.40.1') {
+export function resolveIconUrl(raw, serverUrl = 'http://tower') {
   const value = raw.iconUrl || raw.labels?.['net.unraid.docker.icon'];
   if (typeof value !== 'string' || !value.trim() || value.length > 2000 || /[\u0000-\u001f]/.test(value)) return null;
   try {

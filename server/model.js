@@ -45,7 +45,7 @@ export function validateLayout(value) {
   }
   return { version: 1, revision: value.revision, favorites: [...favorites], groups, overrides };
 }
-export function normalizeContainer(raw, settings, overrides = {}, fallbackHostname = '10.168.40.1', serverUrl = `http://${fallbackHostname}`) {
+export function normalizeContainer(raw, settings, overrides = {}, fallbackHostname = 'tower', serverUrl = `http://${fallbackHostname}`) {
   const originalName = String(raw.names?.[0] || raw.name || raw.id).replace(/^\//, '');
   const id = containerId(raw);
   const override = Object.hasOwn(overrides, id) ? overrides[id] : {};

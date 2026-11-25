@@ -10,7 +10,7 @@ const raw = { id: 'docker-id', names: ['/Plex'], image: 'plex', state: 'RUNNING'
 const settings = { tailscaleHostname: 'tower.tailnet.ts.net', defaultScheme: 'http', refreshSeconds: 30 };
 const png = () => new Response(Uint8Array.from([137, 80, 78, 71]), { headers: { 'content-type': 'image/png' } });
 test('Unraid template icons resolve absolute and relative URLs against server origin, never magic DNS', () => {
-  assert.equal(resolveIconUrl(raw, 'https://10.168.40.1:8443/graphql'), 'https://10.168.40.1:8443/state/plugins/dockerMan/images/Plex-icon.png');
+  assert.equal(resolveIconUrl(raw, 'https://192.0.2.10:8443/graphql'), 'https://192.0.2.10:8443/state/plugins/dockerMan/images/Plex-icon.png');
   assert.equal(resolveIconUrl({ iconUrl: 'https://icons.example/app.png' }), 'https://icons.example/app.png');
   assert.equal(resolveIconUrl({ labels: { 'net.unraid.docker.icon': '/icons/plex.png' } }, 'http://tower'), 'http://tower/icons/plex.png');
   for (const iconUrl of ['file:///secret', 'data:image/png;base64,AAAA', 'javascript:alert(1)', 'https://user:password@icons.example/a.png']) assert.equal(resolveIconUrl({ iconUrl }), null);
