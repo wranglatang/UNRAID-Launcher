@@ -38,6 +38,10 @@ For long inactive periods, configure an external trigger and monitor its success
 
 The root `ca_profile.xml` and `deploy/unraid-launcher.xml` provide repository metadata and a self-contained installation form. The template uses the public stable image, a masked API-key field, bridge networking, dropped capabilities, and non-root UID/GID `99:100`. CI verifies persistent bind-mounted data owned by that identity as well as the image-default named volume.
 
+The repository was submitted and auto-approved on 25 November 2026. Community Applications reports that the app should appear after its next catalogue build publishes. Listing visibility has not yet been verified.
+
+On 25 November 2026, an existing installation on Unraid 7.2.3 was migrated from a locally built image to the published `latest` image (1.0.1), preserving its existing configuration and UID/GID `1000:1000`. Its saved dashboard data matched the backup after recreation and the container was healthy. After publishing 1.0.2, Unraid’s normal Docker update check showed “update ready” and generated “A new version of unraid-launcher is available.” The update was left pending for inspection. This verifies migration and update notification detection; installation from the Apps catalogue remains to be tested.
+
 - Keep the public image available for anonymous pulls and retain fixed versions for rollback.
 - Run Validate and Scan in the [Community Applications submission flow](https://ca.unraid.net/submit/help) after meaningful XML changes, then submit for review.
 - The submission flow requires the Unraid Community Apps GitHub App with Contents read and Issues write access for this repository. Review its repository-health issues and respond to moderator requests.
