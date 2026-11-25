@@ -1,0 +1,115 @@
+name: Publish container
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Stable version tag to publish, for example v1.0.0'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-container
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Test, scan and publish x86-64 image
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      checks: read
+      packages: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Validate release source
+        id: release
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo 'Only stable version tags such as v1.0.0 can be published.' >&2
+            exit 1
+          fi
+          git rev-parse --verify "refs/tags/$RELEASE_TAG^{commit}"
+          git merge-base --is-ancestor "refs/tags/$RELEASE_TAG^{commit}" origin/main
+          git checkout --detach "refs/tags/$RELEASE_TAG"
+          python3 - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          version = os.environ['RELEASE_TAG'][1:]
+          assert json.loads(Path('package.json').read_text())['version'] == version, 'Tag must match package.json version'
+          sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+          data = json.loads(subprocess.check_output(['gh', 'api', f'repos/{os.environ["GITHUB_REPOSITORY"]}/commits/{sha}/check-runs?filter=latest&per_page=100'], text=True))
+          required = {'Test and build (Node 22)', 'Test and build (Node 24)', 'Docker startup and persistence', 'Analyse JavaScript', 'Audit npm dependencies', 'Scan source for secrets', 'Scan freshly built container'}
+          passed = {check['name'] for check in data['check_runs'] if check['conclusion'] == 'success'}
+          assert required <= passed, f'Release commit must pass all main-branch checks first. Missing: {sorted(required - passed)}'
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write(f'version={version}\nsha={sha}\nimage=ghcr.io/{os.environ["GITHUB_REPOSITORY"].lower()}\n')
+          PY
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm audit --audit-level=high
+      - name: Build release candidate
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+          SOURCE_SHA: ${{ steps.release.outputs.sha }}
+        run: |
+          docker build --pull --platform linux/amd64 \
+            --label "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" \
+            --label "org.opencontainers.image.revision=$SOURCE_SHA" \
+            --label "org.opencontainers.image.version=$VERSION" \
+            --label 'org.opencontainers.image.licenses=MIT' \
+            --label 'org.opencontainers.image.description=A lightweight launcher for your Unraid services' \
+            --tag unraid-launcher:release .
+      - name: Check startup and saved data
+        run: bash scripts/check-container.sh unraid-launcher:release
+      - name: Scan the exact release candidate
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
+        with:
+          image-ref: unraid-launcher:release
+          scanners: vuln,secret
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          ignore-unfixed: false
+          timeout: 10m
+      - name: Sign into GitHub Container Registry
+        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish the tested image
+        env:
+          IMAGE: ${{ steps.release.outputs.image }}
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          if docker manifest inspect "$IMAGE:$VERSION" >/dev/null 2>&1; then
+            echo 'This version is already published. Use a new patch version instead of replacing it.' >&2
+            exit 1
+          fi
+          docker tag unraid-launcher:release "$IMAGE:$VERSION"
+          docker push "$IMAGE:$VERSION"
+          docker tag unraid-launcher:release "$IMAGE:latest"
+          docker push "$IMAGE:latest"
+          {
+            echo '## Published container'
+            echo "Image: \`$IMAGE:$VERSION\`"
+            echo "Stable tag: \`$IMAGE:latest\`"
+            echo 'Platform: linux/amd64'
+            docker inspect --format='Digest: {{index .RepoDigests 0}}' "$IMAGE:$VERSION"
+          } >> "$GITHUB_STEP_SUMMARY"
