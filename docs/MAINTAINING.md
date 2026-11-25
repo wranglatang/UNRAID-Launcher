@@ -10,7 +10,7 @@ These settings require GitHub owner access; workflow files cannot enable them th
 - Use the committed CodeQL workflow (advanced setup), without a duplicate default-setup configuration.
 - Keep Actions' default workflow permissions read-only. CodeQL explicitly requests security-event upload permission. The publishing job alone receives package write permission through GitHub’s temporary token; ordinary checks have no publishing credentials.
 - Protect `main` with required pull requests, resolved conversations, and successful checks. Block force pushes and deletion. A solo maintainer should not require another person's approval unless a reviewer is available.
-- After their first successful runs, require `Test and build (Node 22)`, `Test and build (Node 24)`, `Docker startup and persistence`, `Analyse JavaScript`, `Audit npm dependencies`, `Scan source for secrets`, and `Scan freshly built container`.
+- After their first successful runs, require `Test and build (Node 22)`, `Test and build (Node 24)`, `Test and build (Node 26)`, `Docker startup and persistence`, `Analyse JavaScript`, `Audit npm dependencies`, `Scan source for secrets`, and `Scan freshly built container`.
 - Prefer squash merges and deletion of merged branches. Keep the repository public for Community Applications.
 - Enable notifications for failed workflows, security alerts, and issues.
 
@@ -21,6 +21,8 @@ Pull requests and pushes to `main` run tests, builds, XML parsing, a real contai
 Weekly security jobs rescan current source, a freshly rebuilt image, and the published stable image. The published-image job also verifies anonymous pulls and persistence. Dependabot proposes npm, Dockerfile, and workflow updates every Tuesday. Changes require review; stable version tags trigger tested, scanned publication. See [RELEASING.md](RELEASING.md).
 
 Actions are pinned to commit references. Dependabot proposes new references. Review workflow changes as carefully as application code.
+
+Vite and its React plugin are grouped together because major updates can require matching versions. The Node 26 container runtime is covered by the test matrix alongside Node 22 and 24. Local development needs Node 22.12 or newer for the current build tools.
 
 ## Monthly review
 

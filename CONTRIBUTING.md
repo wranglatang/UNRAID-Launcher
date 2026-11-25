@@ -7,7 +7,7 @@ Read the README's troubleshooting section before opening an issue. Include insta
 ## Make a change
 
 1. Fork the repository and create a branch.
-2. Use Node.js 24 and run `npm ci`.
+2. Use Node.js 26 and run `npm ci`.
 3. Copy `.env.example` to `.env`. Use `DEMO_MODE=true` with no real key for UI development.
 4. Run `npm run dev` and make a focused change.
 5. Run `npm test`, `npm run build`, and `npm audit --audit-level=high`.
