@@ -231,7 +231,7 @@ For Compose logs, run `docker compose logs --tail=100 unraid-launcher`. For dire
 
 ## Local development and demo
 
-Use Node.js **24 LTS** to match the container; the project declares Node.js 22 or newer.
+Use Node.js **26 LTS** to match the container; the project declares Node.js 22.12 or newer.
 
 ```sh
 npm ci
