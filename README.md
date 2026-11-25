@@ -267,4 +267,4 @@ Unraid Launcher is an independent community project, not affiliated with or endo
 
 ## Licence
 
-[MIT](LICENSE) © 2026 Philip Wrangles. Third-party packages and assets retain their own licences.
+[MIT](LICENSE) © 2026 wranglatang. Third-party packages and assets retain their own licences.
