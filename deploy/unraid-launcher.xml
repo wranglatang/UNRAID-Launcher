@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>unraid-launcher</Name>
+  <Repository>unraid-launcher:local</Repository>
+  <Registry></Registry>
+  <Network>bridge</Network>
+  <MyIP></MyIP>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/wranglatang/UNRAID-Launcher/issues</Support>
+  <Project>https://github.com/wranglatang/UNRAID-Launcher</Project>
+  <Overview>A private home screen for your Unraid services. Configure the Unraid API key and Tailscale hostname in /mnt/user/appdata/unraid-launcher/.env. Dashboard data is stored in the mapped appdata folder.</Overview>
+  <Category>Tools:</Category>
+  <WebUI>http://[IP]:[PORT:3000]/</WebUI>
+  <TemplateURL></TemplateURL>
+  <Icon>https://raw.githubusercontent.com/wranglatang/UNRAID-Launcher/main/public/icons/launcher-512-v1.png</Icon>
+  <ExtraParams>--env-file=/mnt/user/appdata/unraid-launcher/.env --security-opt=no-new-privileges:true --cap-drop=ALL</ExtraParams>
+  <PostArgs></PostArgs>
+  <CPUset></CPUset>
+  <Config Name="Web interface" Target="3000" Default="9999" Mode="tcp" Description="Launcher web interface" Type="Port" Display="always" Required="true" Mask="false">9999</Config>
+  <Config Name="Dashboard data" Target="/data" Default="/mnt/user/appdata/unraid-launcher/data" Mode="rw" Description="Persistent favourites, folders and preferences" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/unraid-launcher/data</Config>
+</Container>

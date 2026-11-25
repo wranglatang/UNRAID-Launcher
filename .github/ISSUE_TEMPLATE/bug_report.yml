@@ -1,0 +1,31 @@
+name: Bug report
+description: Report a reproducible problem. Do not include secrets or vulnerabilities.
+body:
+  - type: markdown
+    attributes:
+      value: 'For security issues, follow SECURITY.md. Remove API keys, private hostnames, and personal data from reports and screenshots.'
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Explain the expected behaviour and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Installation and versions
+      description: Installation method, Unraid/API version, app commit or version, and browser/device.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional details
+      description: Sanitised logs or screenshots. Never attach .env or dashboard.json.

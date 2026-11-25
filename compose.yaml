@@ -1,0 +1,23 @@
+services:
+  unraid-launcher:
+    build: .
+    container_name: unraid-launcher
+    restart: unless-stopped
+    ports:
+      - "${LAUNCHER_PORT:-9999}:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATA_DIR: /data
+      UNRAID_URL: ${UNRAID_URL:-http://tower}
+      UNRAID_API_KEY: ${UNRAID_API_KEY:-}
+      TAILSCALE_HOSTNAME: ${TAILSCALE_HOSTNAME:-}
+      DEMO_MODE: ${DEMO_MODE:-false}
+    volumes:
+      - launcher-data:/data
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+volumes:
+  launcher-data:
