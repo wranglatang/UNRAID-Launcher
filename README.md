@@ -44,9 +44,34 @@ The launcher reads container information. It does not start, stop, or change you
 
 The launcher does not install Tailscale or proxy your applications. Your browser must be able to reach each service directly. No minimum Unraid version has been verified yet; compatibility depends on the available API schema.
 
-**Ready-to-install image:** `ghcr.io/wranglatang/unraid-launcher:latest` ([published versions](https://github.com/wranglatang/UNRAID-Launcher/pkgs/container/unraid-launcher)). The image supports x86-64 (`linux/amd64`), matching Unraid servers. No compiler, Node.js installation, or GitHub sign-in is needed on your server. Community Applications approved the repository on 25 November 2026; the app is awaiting the next catalogue build before appearing in Unraid’s Apps tab. Until then, use the [manual Unraid template installation](deploy/README.md) or Docker Compose below.
+**Ready-to-install image:** `ghcr.io/wranglatang/unraid-launcher:latest` ([published versions](https://github.com/wranglatang/UNRAID-Launcher/pkgs/container/unraid-launcher)). The image supports x86-64 (`linux/amd64`), matching Unraid servers. No compiler, Node.js installation, or GitHub sign-in is needed on your server.
 
-### 1. Download the configuration
+### Install from Unraid Community Apps
+
+1. [Create an Unraid API key](#2-create-an-api-key) with permission to read Docker container information.
+2. Open the **Apps** tab in your Unraid WebGUI and search for **unraid-launcher**. Select the app from **wranglatang’s Repository** and choose **Install**. You can also [search the Community Apps catalogue](https://ca.unraid.net/apps?category=all&q=unraid-launcher).
+3. Fill in the installation form:
+
+   | Setting | What to enter |
+   | --- | --- |
+   | Web interface | Keep host port `9999`, or choose another unused port. |
+   | Dashboard data | Keep `/mnt/user/appdata/unraid-launcher/data` for a new installation. This stores your favourites, folders and preferences. |
+   | Unraid WebGUI address | Your server’s HTTP/HTTPS address, reachable from the container. Include a port if needed; do not use `localhost`. |
+   | Unraid API key | The read-only key you created above. |
+   | Destination hostname | Your Tailscale MagicDNS hostname without a protocol, port or path. Leave empty to choose it later in the launcher’s Settings. |
+
+4. Keep bridge networking, privileged mode off, and demo mode `false`. Choose **Apply** to download and start the app. Enable **Autostart** on the Docker page if you want it to start with your server.
+5. On the **Docker** page, open the launcher’s **WebUI** from its container menu, then follow [Make it yours](#make-it-yours) to add favourite apps and folders.
+
+No `.env` file or terminal commands are needed for this installation method. Keep the dashboard data mapping when updating, and use Unraid’s normal Docker update controls.
+
+The repository has been approved by Community Applications. If the app is not searchable yet, its catalogue build may still be pending; use the [manual Unraid template installation](deploy/README.md) in the meantime.
+
+**Already running the launcher?** Update your existing container rather than installing a second copy. Preserve its settings and data mapping; see the [migration guide](deploy/README.md#migrate-an-existing-installation).
+
+### Alternative: Docker Compose or direct Docker
+
+#### 1. Download the configuration
 
 For a new installation using Docker Compose, open your Unraid terminal:
 
@@ -61,13 +86,13 @@ You can also download those two files from [the repository](https://github.com/w
 
 **Already installed from source?** Keep your existing Compose project directory, `.env`, and data mapping. Update the Compose file in place and use the commands below. Moving to a different project directory can select a different named volume and make your saved dashboard appear missing.
 
-### 2. Create an API key
+#### 2. Create an API key
 
 In Unraid, open **Settings → Management Access → API Keys** and create a key for the launcher. Give it only the permissions needed to read Docker container information. See [Unraid’s API instructions](https://docs.unraid.net/API/how-to-use-the-api/) for API key management.
 
 Keep the key private. The backend passes it to Unraid; it is not sent to your browser or forwarded to icon hosts. The interactive GraphQL sandbox does not need to be enabled.
 
-### 3. Configure your server
+#### 3. Configure your server
 
 From your installation directory (for a new installation only):
 
@@ -93,7 +118,7 @@ DEMO_MODE=false
 
 Your `.env` and saved dashboard data are excluded from Git. Never attach them to an issue or include them in a screenshot.
 
-### 4. Start the launcher
+#### 4. Start the launcher
 
 **With Docker Compose:**
 
@@ -115,7 +140,7 @@ docker run -d --name unraid-launcher --restart unless-stopped \
 
 The direct Docker command uses `9999` literally; edit `-p` to choose another host port. `LAUNCHER_PORT` is used by Compose only. To install through Unraid’s Docker screen using an appdata folder, follow the [native Unraid guide](deploy/README.md).
 
-### 5. Open your dashboard
+#### 5. Open your dashboard
 
 Open `http://tower.your-tailnet.ts.net:9999`, substituting your real hostname and port. You can also use the server’s reachable LAN address.
 
