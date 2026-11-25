@@ -11,7 +11,11 @@ FROM node:24-alpine AS runtime
 ENV NODE_ENV=production PORT=3000 DATA_DIR=/data
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --omit=dev && npm cache clean --force
+# Package managers are needed during installation, not while serving the app.
+# Remove their bundled dependencies from the final runtime image.
+RUN npm ci --omit=dev && npm cache clean --force \
+    && rm -rf /usr/local/lib/node_modules/npm /opt/yarn-* \
+    && rm -f /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/yarn /usr/local/bin/yarnpkg
 COPY --from=build /app/dist ./dist
 COPY server ./server
 RUN mkdir -p /data && chown node:node /data
